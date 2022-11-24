@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.DataAccess.Repository.IRepository
 {
-    public interface ICoverTypeRepository : IRepository<CoverType> 
+    public interface IProductRepository : IRepository<Product>
     {
-        void Update(CoverType coverType);
+        void Update(Product product);
     }
 }

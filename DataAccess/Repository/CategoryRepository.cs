@@ -10,18 +10,18 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.DataAccess.Repository
 {
-    public class CoverTypeRepository : Repository<CoverType>, ICoverTypeRepository
+    public class CategoryRepository : Repository<Category>, ICategoryRepository
     {
         private readonly ApplicationDbContext _db;
 
-        public CoverTypeRepository(ApplicationDbContext db) : base(db)
+        public CategoryRepository(ApplicationDbContext db) : base(db)
         {
             _db = db;
         }
 
-        public void Update(CoverType coverType)
+        public void Update(Category category)
         {
-            _db.CoverTypes.Update(coverType);
+            _db.Categories.Update(category);
         }
     }
 }
