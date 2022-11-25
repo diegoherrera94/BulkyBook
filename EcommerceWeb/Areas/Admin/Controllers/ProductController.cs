@@ -20,9 +20,8 @@ namespace EcommerceWeb.Controllers
         }
 
         public IActionResult Index()
-        {
-            IEnumerable<Product> products = _unitOfWork.Product.GetAll();
-            return View(products);
+        {            
+            return View();
         }
 
         public IActionResult Upsert(int? id)
@@ -40,14 +39,9 @@ namespace EcommerceWeb.Controllers
                 })
             };
 
-            if (id == null || id == 0)
+            if (id != null && id > 0)
             {
-                //create product
-                return View(productVM);
-            }
-            else
-            {
-                //update product
+                productVM.Product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id);
             }
 
             return View(productVM);
@@ -55,7 +49,7 @@ namespace EcommerceWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(ProductVM productVM, IFormFile file)
+        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
@@ -66,50 +60,69 @@ namespace EcommerceWeb.Controllers
                     var uploads = Path.Combine(wwwRootPath, @"images\products");
                     var extension = Path.GetExtension(file.FileName);
 
+                    if (productVM.Product.ImageUrl != null)
+                    {
+                        var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
                     using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
                     {
                         file.CopyTo(fileStreams);
                     }
                     productVM.Product.ImageUrl = @"\images\products\" + fileName + extension;
                 }
-                _unitOfWork.Product.Add(productVM.Product);
+
+                if (productVM.Product.Id != 0)
+                {
+                    _unitOfWork.Product.Update(productVM.Product);
+                    TempData["success"] = "Product updated successfuly";
+                }
+                else
+                {
+                    _unitOfWork.Product.Add(productVM.Product);
+                    TempData["success"] = "Product added successfuly";
+                }
+                
                 _unitOfWork.Save();
-                TempData["success"] = "Product added successfuly";
                 return RedirectToAction("Index");
             }
             return View(productVM);
         }
 
+        #region API CALLS
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var products = _unitOfWork.Product.GetAll("Category,CoverType");
+            return Json(new { data = products});
+        }
+
+        [HttpDelete]
         public IActionResult Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeletePost(int? id)
-        {
             var product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id);
             if (product == null)
             {
-                return NotFound();
+                return Json(new { success = false, message = "Error deleting product"});
             }
+
+            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, product.ImageUrl.TrimStart('\\'));
+
+            if (System.IO.File.Exists(oldImagePath))
+            {
+                System.IO.File.Delete(oldImagePath);
+            }
+
             _unitOfWork.Product.Remove(product);
             _unitOfWork.Save();
-            TempData["success"] = "Produdct deleted successfuly";
-            return RedirectToAction("Index");
+
+            return Json(new { success = true, message = "Product deleted successfuly" });
         }
+        #endregion
     }
 }

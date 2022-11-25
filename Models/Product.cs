@@ -24,12 +24,14 @@ namespace Ecommerce.Models
         public string ImageUrl { get; set; }
 
         [Required]
+        [DisplayName("Category")]
         public int CategoryId { get; set; }
         [ForeignKey("CategoryId")]
         [ValidateNever]
         public Category Category { get; set; }
 
         [Required]
+        [DisplayName("Cover Type")]
         public int CoverTypeId { get; set; }
         [ValidateNever]
         public CoverType CoverType { get; set; }

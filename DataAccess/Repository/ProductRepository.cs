@@ -37,7 +37,6 @@ namespace Ecommerce.DataAccess.Repository
                     productToUpdate.ImageUrl = product.ImageUrl;
                 }
             }
-            _db.Products.Update(product);
         }
     }
 }
