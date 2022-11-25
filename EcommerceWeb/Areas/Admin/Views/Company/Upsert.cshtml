@@ -1,0 +1,66 @@
+﻿@model Company
+@{
+    ViewData["Title"] = (Model.Id == 0) ? "Create" : "Edit";
+}
+
+<h1>@(Model.Id == 0 ? "Create" : "Edit") Company</h1>
+
+<form method="post" asp-action="Upsert" enctype="multipart/form-data">
+    <input asp-for="Id" type="hidden" />
+
+    <div asp-validation-summary="All"></div>
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control">
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Address1" class="form-label"></label>
+        <input asp-for="Address1" class="form-control">
+        <span asp-validation-for="Address1" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Address2" class="form-label"></label>
+        <input asp-for="Address2" class="form-control">
+        <span asp-validation-for="Address2" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="City" class="form-label"></label>
+        <input asp-for="City" class="form-control">
+        <span asp-validation-for="City" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="State" class="form-label"></label>
+        <input asp-for="State" class="form-control">
+        <span asp-validation-for="State" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="PostalCode" class="form-label"></label>
+        <input asp-for="PostalCode" class="form-control">
+        <span asp-validation-for="PostalCode" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label"></label>
+        <input asp-for="Phone" class="form-control">
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    @if (Model.Id == 0)
+    {
+        <button type="submit" class="btn btn-primary">Create</button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-primary">Update</button>
+    }
+
+    <a asp-controller="Company" asp-action="Index" class="btn btn-secondary">
+        Back to list
+    </a>
+</form>
+
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
